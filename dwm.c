@@ -100,6 +100,11 @@ struct Client {
 };
 
 typedef struct {
+      Window root;
+      Window to_move;
+} Shift_item;
+
+typedef struct {
 	unsigned int mod;
 	KeySym keysym;
 	void (*func)(const Arg *);
@@ -210,7 +215,8 @@ static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *);
-static void iter(const Arg* arg);
+static void shift_item(const Arg* arg);
+static void undo_shift_item();
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
@@ -238,6 +244,7 @@ static void zoom(const Arg *arg);
 
 /* variables */
 /*Window* windows_moved = ma*/
+Shift_item si[100]; u_int8_t si_s = 0;
 static const char broken[] = "broken";
 static char stext[256];
 static int screen;
@@ -1767,8 +1774,17 @@ col(Monitor *m) {
 
 // this will use the stack of shifted clients
 // TODO: rename this func
-/*void undo_iter();*/
-void iter(const Arg* arg){
+void undo_shift_item(){
+      XWindowAttributes wa;
+      XGetWindowAttributes(dpy, si[si_s-1].root, &wa);
+      manage(si[--si_s].to_move, &wa);
+      /*
+       *si[si_s].
+       *si[--si_s]
+       */
+}
+
+void shift_item(const Arg* arg){
       FILE* fp;
       // for debugging
       fp = fopen("/home/asher/vm", "w");
@@ -1790,6 +1806,9 @@ void iter(const Arg* arg){
                         /*XGetWindowAttributes(dpy, Window w, &wa);*/
                         // should not use root lol
                         XGetWindowAttributes(dpy, root, &wa);
+                        /*Window tmp_root = root;*/
+                        si[si_s].root = root;
+                        si[si_s++].to_move = c->win;
                         if(root != c->win)
                         manage(c->win, &wa);
                         else fprintf(fp, "refusing to manage. samesies\n");
