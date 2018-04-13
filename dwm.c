@@ -1778,10 +1778,6 @@ void undo_shift_item(){
       XWindowAttributes wa;
       XGetWindowAttributes(dpy, si[si_s-1].root, &wa);
       manage(si[--si_s].to_move, &wa);
-      /*
-       *si[si_s].
-       *si[--si_s]
-       */
 }
 
 void shift_item(const Arg* arg){
@@ -1797,13 +1793,7 @@ void shift_item(const Arg* arg){
                   fprintf(fp, "client: \"%s\"\n", c->name);
                   if(is_substr(((char**)arg->v)[0], c->name)){
                         fprintf(fp, "found a substr: \"%s\"\n", c->name);
-                        
-                        /*XEvent ev;*/
-                        /*XM*/
-                        // this is grabbed from line 1123 of dwm.c
-                        // possibly use XMaxRequestEvent
                         XWindowAttributes wa;
-                        /*XGetWindowAttributes(dpy, Window w, &wa);*/
                         // should not use root lol
                         XGetWindowAttributes(dpy, root, &wa);
                         /*Window tmp_root = root;*/
@@ -2257,10 +2247,6 @@ main(int argc, char *argv[])
 {
       char ptr_str[10000];
       sprintf(ptr_str, "%p", (void*)(&running));
-      // asher wrote this shit lol
-      /*Monitor* mo = selmon;*/
-      /*fputs(ptr_str, fp);*/
-
 	if (argc == 2 && !strcmp("-v", argv[1]))
 		die("dwm-"VERSION "\n");
 	else if (argc != 1)
